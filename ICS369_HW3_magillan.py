@@ -1,17 +1,15 @@
 # ICS_369_HW3_Setup.py
-
 # do all import calls at beginning of file -------------------------------------
 import maya.cmds as cmds
 import math
 import random as rand
 
 # util functions ---------------------------------------------------------------
-
 # add two vectors
 def vecAdd(v1, v2):
     return (v1[0]+v2[0], v1[1]+v2[1], v1[2]+v2[2])
 
-# scale a vector
+# scale a vector by a scalar
 def vecScale(v, s):
     return (v[0]*s, v[1]*s, v[2]*s)
                 
@@ -21,23 +19,25 @@ def makeCube():
     return nodeList[0]
 
 # particle code ----------------------------------------------------------------
-
 # define particle as list of attributes [node, position, velocity]
 def makeParticle(pos, vel):
     return [makeCube(), pos, vel]
 
 def getNode(ptcl):
     return ptcl[0]
+
 def setNode(ptcl, node):
     ptcl[0] = node
     
 def getPos(ptcl):
     return ptcl[1]
+
 def setPos(ptcl, pos):
     ptcl[1] = pos
     
 def getVel(ptcl):
     return ptcl[2]
+
 def setVel(ptcl, vel):
     ptcl[2] = vel
 
@@ -47,10 +47,17 @@ def updateNode(ptcl):
     cmds.move(pos[0], pos[1], pos[2], getNode(ptcl))
 
 # update particle velocity
-def applyForces(ptcl, gravity, wind):
+def applyForces(ptcl, gravity, wind, groundY):
     vel = getVel(ptcl)
+    pos = getPos(ptcl)
+    
+    # always apply gravity
     newVel = vecAdd(vel, gravity)
-    newVel = vecAdd(newVel, wind)
+    
+    # only apply wind if particle is above ground
+    if pos[1] > groundY:
+        newVel = vecAdd(newVel, wind)
+    
     setVel(ptcl, newVel)
 
 # update particle position by its velocity
@@ -60,28 +67,28 @@ def updatePos(ptcl):
     newPos = vecAdd(pos, vel)
     setPos(ptcl, newPos)
 
-# handle ground collision
-def handleCollision(ptcl, groundY, elasticity, friction):
+# handle ground collision with elasticity and friction
+def handleGroundCollision(ptcl, groundY, elasticity, friction):
     pos = getPos(ptcl)
     vel = getVel(ptcl)
-
+    
     # check if particle is at or below ground
     if pos[1] <= groundY:
         # move particle back to ground level
         setPos(ptcl, (pos[0], groundY, pos[2]))
-
-        # apply elasticity - reverse y velocity
+        
+        # apply elasticity (bounce) - reverse y velocity and scale by elasticity
         newVelY = -vel[1] * elasticity
-
-        # apply friction - slow x and z components
+        
+        # apply friction - slow down x and z components
         newVelX = vel[0] * (1.0 - friction)
         newVelZ = vel[2] * (1.0 - friction)
-
+        
         setVel(ptcl, (newVelX, newVelY, newVelZ))
 
-# update the particle (position. forces, collision, node)
+# update the particle (position, forces, collision, node)
 def updateParticle(ptcl, gravity, wind, groundY, elasticity, friction):
-    applyForces(ptcl, gravity, wind)
+    applyForces(ptcl, gravity, wind, groundY)
     updatePos(ptcl)
     handleCollision(ptcl, groundY, elasticity, friction)
     updateNode(ptcl)
@@ -115,18 +122,10 @@ minVel = (-1.0, -1.0, -1.0)
 maxVel = (1.0, 1.0, 1.0)
 gravity = (0, -0.098, 0)  # gravity force in -y direction
 wind = (0.01, 0, 0)  # slight wind in +x direction
-groundY = 0  # ground plane at y=0
+groundY = 1  # ground plane at y=1
 elasticity = 0.7  # 70% bounce
-friction = 0.1  # 10% slowdown per collision
+friction = 0.5  # 50% slowdown per collision
 
 # create and run particles
 particles = initParticles(100, minVel, maxVel)
 runParticles(particles, 240, gravity, wind, groundY, elasticity, friction)
-
-
-
-
-
-
-
-
