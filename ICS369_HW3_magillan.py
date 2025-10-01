@@ -1,4 +1,4 @@
-# ICS_369_HW3_Setup.py
+# ICS369_HW3_magillan.py
 # do all import calls at beginning of file -------------------------------------
 import maya.cmds as cmds
 import math
@@ -90,7 +90,7 @@ def handleGroundCollision(ptcl, groundY, elasticity, friction):
 def updateParticle(ptcl, gravity, wind, groundY, elasticity, friction):
     applyForces(ptcl, gravity, wind, groundY)
     updatePos(ptcl)
-    handleCollision(ptcl, groundY, elasticity, friction)
+    handleGroundCollision(ptcl, groundY, elasticity, friction)
     updateNode(ptcl)
 
 # set keyframe for particle
