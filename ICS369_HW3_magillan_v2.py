@@ -58,7 +58,10 @@ def setAngularVel(ptcl,angVel):
 # move Maya node to the particle position
 def updateNode(ptcl):
     pos = getPos(ptcl)
+    rot = getRot(ptcl)
+    node = getNode(ptcl)
     cmds.move(pos[0], pos[1], pos[2], getNode(ptcl))
+    cmds.rotate(rot[0], rot[1], rot[2], node, absolute=True)
 
 # update particle velocity
 def applyForces(ptcl, gravity, wind, groundY):
@@ -81,6 +84,13 @@ def updatePos(ptcl):
     newPos = vecAdd(pos, vel)
     setPos(ptcl, newPos)
 
+# update particle rotation by its angular velocity
+def updateRot(ptcl):
+    rot = getRot(ptcl)
+    angVel = getAngularVel(ptcl)
+    newRot = vecAdd(rot, angVel)
+    setRot(ptcl, newRot)
+
 # handle ground collision with elasticity and friction
 def handleGroundCollision(ptcl, groundY, elasticity, friction):
     pos = getPos(ptcl)
@@ -100,10 +110,16 @@ def handleGroundCollision(ptcl, groundY, elasticity, friction):
         
         setVel(ptcl, (newVelX, newVelY, newVelZ))
 
+        # lower angular velocity after collision
+        angVel = getAngularVel(ptcl)
+        lowerAngVel = vecScale(angVel,0.8) # reduce rotation by 20%
+        setAngularVel(ptcl, lowerAngVel)
+
 # update the particle (position, forces, collision, node)
 def updateParticle(ptcl, gravity, wind, groundY, elasticity, friction):
     applyForces(ptcl, gravity, wind, groundY)
     updatePos(ptcl)
+    updateRot(ptcl)
     handleGroundCollision(ptcl, groundY, elasticity, friction)
     updateNode(ptcl)
 
@@ -119,7 +135,11 @@ def initParticles(num, minVel, maxVel):
         vel = (rand.uniform(minVel[0], maxVel[0]), 
                rand.uniform(minVel[1], maxVel[1]), 
                rand.uniform(minVel[2], maxVel[2]))
-        particleList.append(makeParticle(pos, vel))
+        # add random angular velocity
+        angVel = (rand.uniform(-10,10),
+                  rand.uniform(-10,10),
+                  rand.uniform(-10,10))
+        particleList.append(makeParticle(pos, vel, angVel=angVel))
     return particleList
 
 # run a list of particles for a number of frames
@@ -135,11 +155,11 @@ def runParticles(particles, frames, gravity, wind, groundY, elasticity, friction
 minVel = (-1.0, -1.0, -1.0)
 maxVel = (1.0, 1.0, 1.0)
 gravity = (0, -0.098, 0)  # gravity force in -y direction
-wind = (0.01, 0, 0)  # slight wind in +x direction
+wind = (0.05, 0, 0)  # slight wind in +x direction
 groundY = 1  # ground plane at y=1
 elasticity = 0.7  # 70% bounce
 friction = 0.5  # 50% slowdown per collision
 
 # create and run particles
-particles = initParticles(100, minVel, maxVel)
+particles = initParticles(20, minVel, maxVel)
 runParticles(particles, 100, gravity, wind, groundY, elasticity, friction)
