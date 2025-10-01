@@ -9,7 +9,7 @@ import random as rand
 def vecAdd(v1, v2):
     return (v1[0]+v2[0], v1[1]+v2[1], v1[2]+v2[2])
 
-# scale a vector by a scalar
+# scale a vector by a scalar (test)
 def vecScale(v, s):
     return (v[0]*s, v[1]*s, v[2]*s)
                 
@@ -128,4 +128,4 @@ friction = 0.5  # 50% slowdown per collision
 
 # create and run particles
 particles = initParticles(100, minVel, maxVel)
-runParticles(particles, 240, gravity, wind, groundY, elasticity, friction)
+runParticles(particles, 100, gravity, wind, groundY, elasticity, friction)
