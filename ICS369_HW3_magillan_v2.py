@@ -4,6 +4,8 @@ import maya.cmds as cmds
 import math
 import random as rand
 
+# this code adds rotation to the cubes. 
+
 # util functions ---------------------------------------------------------------
 # add two vectors
 def vecAdd(v1, v2):
@@ -19,9 +21,9 @@ def makeCube():
     return nodeList[0]
 
 # particle code ----------------------------------------------------------------
-# define particle as list of attributes [node, position, velocity]
-def makeParticle(pos, vel):
-    return [makeCube(), pos, vel]
+# define particle as list of attributes [node, position, velocity, rotation, angularVelocity]
+def makeParticle(pos, vel, rot=(0,0,0), angVel=(0,0,0)):
+    return [makeCube(), pos, vel, rot, angVel]
 
 def getNode(ptcl):
     return ptcl[0]
@@ -40,6 +42,18 @@ def getVel(ptcl):
 
 def setVel(ptcl, vel):
     ptcl[2] = vel
+
+def getRot(ptcl):
+    return ptcl[3]
+
+def setRot(ptcl,rot):
+    ptcl[3] = rot
+
+def getAngularVel(ptcl):
+    return ptcl[4]
+
+def setAngularVel(ptcl,angVel):
+    ptcl[4] = angVel
 
 # move Maya node to the particle position
 def updateNode(ptcl):
