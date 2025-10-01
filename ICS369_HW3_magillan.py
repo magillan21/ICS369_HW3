@@ -68,7 +68,7 @@ def handleCollision(ptcl, groundY, elasticity, friction):
     # check if particle is at or below ground
     if pos[1] <= groundY:
         # move particle back to ground level
-        setPos(ptcl, pos[0], groundY, pos[2]))
+        setPos(ptcl, (pos[0], groundY, pos[2]))
 
         # apply elasticity - reverse y velocity
         newVelY = -vel[1] * elasticity
