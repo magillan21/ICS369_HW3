@@ -155,7 +155,7 @@ def runParticles(particles, frames, gravity, wind, groundY, elasticity, friction
 minVel = (-1.0, -1.0, -1.0)
 maxVel = (1.0, 1.0, 1.0)
 gravity = (0, -0.098, 0)  # gravity force in -y direction
-wind = (0.05, 0, 0)  # slight wind in +x direction
+wind = (0.01, 0, 0)  # slight wind in +x direction
 groundY = 1  # ground plane at y=1
 elasticity = 0.7  # 70% bounce
 friction = 0.5  # 50% slowdown per collision
